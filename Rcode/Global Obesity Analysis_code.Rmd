@@ -1,0 +1,676 @@
+---
+title: "Global Obesity Analysis"
+output: word_document
+#output: html_document
+---
+
+###### Author: Keerthana Kesavan
+
+# **Introduction**
+
+### **What is obesity?**
+
+Obesity is a complex disease characterized by an abnormally high level of body fat. Body fat is not an illness in and of itself, but having too much additional fat in your body can alter how it operates. Obesity is generally defined by the Body Mass Index (BMI). BMI is a measure of body fat based on height and weight that is calculated by dividing the body mass (in kilograms) by the square of the body height (in meters). Obesity is often associated with a BMI of 30 or above, according to healthcare professionals. But as BMI does not directly measure body fat, some individuals, such as athletes, may have a BMI in the obese range while having no extra body fat.
+
+### **What causes obesity?**
+
+Many factors impact body weight, including genes, early life effects, poor diets, insufficient physical exercise, and inadequate sleep. Obesity develops when you consume more calories than you burn via typical everyday activity and exercise, despite genetic and hormonal variables. These extra calories are stored as fat by your body.
+Unhealthy diets - A calorie-dense diet high in fast food and low in fruits and vegetables, as well as a high intake of high-calorie liquids such as alcohol,sugared soft drinks, and large portions, promotes weight gain. 
+Inactivity - Sedentary lifestyles can easily lead to consuming more calories than are burnt via exercise and everyday activities. Staring at computers, tablets and phone screens are examples of sedentary behaviors. 
+
+### **What are some health side effects of obesity?**
+
+Raised BMI is a major risk factor for many diseases:
+
+- Cardiovascular diseases (mainly heart disease and stroke)
+- High blood pressure
+- Diabetes
+- Sleep apnea
+- Musculoskeletal disorders
+- Cancers(endometrial, breast, ovarian, prostate, liver, gallbladder, kidney, and colon)
+- Pregnancy problem
+
+Obesity has non-medical side effects as well. These are the side effects that decrease the quality of life for the person. 
+
+- Depression
+- Disability
+- Shame/Guilt
+- Social Isolation
+- Lower work achievement
+
+These and more are examples of things people can experience when dealing with obesity (Mayo Clinic).
+
+### **Trends of Obesity Globally**
+
+Obesity is a pressing global issue, and it is only getting worse with time. The World Health Organization has described obesity as a global epidemic. The obesity rate has nearly tripled since 1975 over the world, with approximately 13% of adults being obese and approximately 39% of adults being overweight.
+
+# **Analysis**
+
+### How We Got the Data:
+
+The World Health Organization's website has a tab leading to the Global Health Observatory. Here there are lists of data sets about countries and health topics. As our group's main focus has been centered around obesity on a global scale, we have been looking into data sets that provide insight to different aspects of the topic. So far these data sets include:
+
+- Prevalence of obesity among adults, BMI & GreaterEqual; 30 (age-standardized estimate)(%)
+- Prevalence of overweight among adults, BMI & Greater Equal; 25 (age-standardized estimate)(%)
+- Mean BMI (kg/m2) (age-standardized estimate)
+- Has conducted a recent, national adult risk factor survey covering overweight and obesity
+- Has conducted a recent, national adult risk factor survey covering unhealthy diet
+- Has conducted a recent, national adult risk factor survey covering physical inactivity
+- Probability of Deaths
+- Raised Blood Pressure
+
+
+![](./Screenshots/BodyMassIndex.png)
+https://www.lipedema.net/lipedema-lymphedema-obesity.html
+
+### Data Cleaning and Preparation:
+
+In order to clean and prepare the datasets, we performed the following steps:
+
+- Handling the null values: For all the 6 datasets, we analaysed the missing data values in key variables. For example, for the Prevalence of Obesity & Overweight dataset,the null values accounted for only 0.01% of the data, hence we decided to remove them from the dataset.
+- Renaming and selecting relevant columns: After doing our initial analysis, we selected the columns with relevant information and renamed those columns to make them more intuitive
+- Merging similar datasets: We realised that some of our datasets were correlated and had similar data structure. So we combined such datasets into one making it easier to use them. For example, Prevalence of Obesity and Prevalence of Overweight had the same data structure, so we merged these two datasets into one (refer to the screenshots below for more details). The same technique was applied for "Risk factor survey covering overweight and obesity", "Risk factor survey covering unhealthy diet" and
+"Risk factor survey covering physical inactivity".
+- Analyzing and treating outliers: We created boxplots to understand the data outliers. We decided to leave these outliers in because it was clear that these dat points were not due to measurement issues and had actual value.
+- Appropriate data type conversion: We converted the data type of few columns into the required data type, wherever needed.
+
+
+Here are some "before" and "after" screenshots of our data to give you an idea of our data sets:
+
+![Prevalence of Obese Before](./Screenshots of Data/Prevalence_obese.png)
+
+![Prevalence of Overweight Before](./Screenshots of Data/Prevalence_overweight.png)
+
+![Prevalence of Obese and Overweight After](./Screenshots of Data/prevalence_cleaned.png)
+
+![Mean BMI Before Part 1](./Screenshots of Data/BMI_1.png)
+
+![Mean BMI Before Part 2](./Screenshots of Data/BMI_2.png)
+
+![Mean BMI After](./Screenshots of Data/BMI_clean.png)
+
+![Has conducted a recent, national adult risk factor survey covering overweight and obesity Before](./Screenshots of Data/Factor_Obesity.png)
+
+![Has conducted a recent, national adult risk factor survey covering unhealthy diet Before](./Screenshots of Data/Factor_Unhealthy.png)
+
+![Has conducted a recent, national adult risk factor survey covering physical inactivity Before](./Screenshots of Data/Factor_Inactivity.png)
+
+![Global Surveys of Overweight/Obese, Unhealthy Diet, and Physical Inactivity After](./Screenshots of Data/Factors_clean.png)
+
+
+
+
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r libraries, include=FALSE, warning=FALSE}
+library(tidyverse)
+library(readr)
+library(ggplot2)
+library(gridExtra)
+library(tinytex)
+```
+
+```{r importing_data, echo=FALSE,warning=FALSE,message=FALSE}
+blood_pressure <- read_csv("./Data/blood_pressure_clean.csv", show_col_types = FALSE)
+risk_factor <- read_csv("./Data/clean_factor_data.csv", show_col_types = FALSE)
+deaths <- read_csv("./Data/deaths_data_clean.csv", show_col_types = FALSE)
+prev_merge1 <- read_csv("./Data/Prevalence_Merge_Clean_2.csv", show_col_types = FALSE)
+bmi <- read.csv("./Data/BMI_clean.csv", head=T)
+bmi <- bmi %>% rename(BMI = meanBMI)
+depression_tibble <- read.csv("./Data/depression_clean.csv", head=T)
+
+
+#order:
+#bmi
+#blood pressure
+#depression
+#prevalence of overweight
+#prevalence of obesity
+#deaths
+```
+
+### **Data Exploration**
+
+In our exploratory analysis we are beginning to ask questions about the global status of overweight and obesity. Using data from the World Health Organization we are able to dive into the rates of obesity across different regions of the world. 
+
+```{r, echo=FALSE, warning=FALSE,message=FALSE}
+data <- read_csv("./Data/Prevalence_Merge_Clean_2.csv", show_col_types = FALSE)
+tibbled_data <- as_tibble(data)
+# tibbled_data
+reg_wise_count <- tibbled_data %>% group_by(ParentLocation) %>%
+  count(ParentLocation)
+pie(reg_wise_count$n, labels = reg_wise_count$ParentLocation) + title("Count of records per region")
+```
+
+**Figure 1:** The World Health Organization's data on Prevalence of Overweight and Obesity in the regions is not sampled uniformly across the regions. Some regions had more countries participating in the research compared to others. 
+
+```{r, echo=FALSE,warning=FALSE,message=FALSE}
+F1 <- risk_factor %>%
+  filter(RiskFactorSurvey_Topic == "RiskFactorSurvey_Diet")%>%
+  ggplot(aes(fill=Values, x=ParentLocation))+
+  geom_bar(position = "stack") +
+  labs(x = NULL, 
+       y = "Count of Coutries",
+       fill = "Unhealthy Diets")+
+  coord_flip()
+
+F2 <- risk_factor %>%
+  filter(RiskFactorSurvey_Topic == "RiskFactorSurvey_Inactivity")%>%
+  ggplot(aes(fill=Values, x=ParentLocation))+
+  geom_bar(position = "stack")+
+  labs(x = NULL, 
+       y = "Count of Coutries",
+       fill = "Inactivity")+
+  coord_flip()
+
+F3 <- risk_factor %>%
+  filter(RiskFactorSurvey_Topic == "RiskFactorSurvey_Obesity")%>%
+  ggplot(aes(fill=Values, x=ParentLocation))+
+  geom_bar(position = "stack")+
+  labs(x = NULL, y = "Count of Coutries",
+       fill = "Obesity")+
+  coord_flip()
+
+grid.arrange(F1, F2, F3, nrow = 3, 
+             top = "2021 -  Has Conducted a National Survey for:")    
+```
+
+**Figure 2:** The above graph shows the count of countries in each of the regions that are taking surveys or not based on the three topics. These three topics are:
+
+- Has conducted a recent, national adult risk factor survey covering overweight and obesity
+- Has conducted a recent, national adult risk factor survey covering unhealthy diet
+- Has conducted a recent, national adult risk factor survey covering physical inactivity
+
+This graph does not necessarily show which regions are the most active or have the least healthy of diets. It is more an understanding of which regions are trying to understand the population's trends. 
+
+The World Health Organization has many years of data on prevalence of overweight among adults and prevalence of obesity among adults. The measurement method for deterimining “overweight” and “obese” is using the Body Mass Index. According to the United States CDC, “Body Mass Index (BMI) is a person’s weight in kilograms (or pounds) divided by the square of height in meters (or feet). A high BMI can indicate high body fatness. BMI screens for weight categories that may lead to health problems, but it does not diagnose the body fatness or health of an individual”. Some questions to ask are:
+
+1. Do overweight and obesity rates depend on the region?
+2. Is there a difference in the prevalence of overweight and obesity among different sexes?
+3. How has the prevalence of overweight and obesity changed over the years?
+
+
+```{r, echo=FALSE,warning=FALSE,message=FALSE}
+## Prevalence of Overweight by Region
+plot1_overwt <- ggplot(prev_merge1,aes(x=ParentLocation,
+                                        y=Prev_overwt,color=Sex)) +
+geom_point(alpha = 0.3) + ggtitle("Prevalence of Overweight by Region") +
+  xlab("Region") + 
+  ylab("Prevalence")+
+  geom_jitter() +
+  scale_x_discrete(guide = guide_axis(angle = 45))
+plot1_overwt
+```
+
+**Figure 3**
+
+```{r, echo=FALSE,warning=FALSE,message=FALSE}
+
+## Prevalence of Obesity by Region
+plot1_obese <- ggplot(prev_merge1,aes(x=ParentLocation,y=Prev_obesity,
+                                       color=Sex)) +
+geom_point(alpha=0.3) + ggtitle("Prevalence of Obesity by Region") +
+  xlab("Region") + 
+  ylab("Prevalence")+
+  geom_jitter() +
+  scale_x_discrete(guide = guide_axis(angle = 45))
+plot1_obese
+```
+
+**Figure 4**
+
+As we can see in Figure 3 and Figure 4, the prevalence of overweight and obesity might have different distributions based on region. We can also see that the overall maximum percentages are lower for obesity than for overweight. This is a good thing, and it is also to be expected. In order to cross the boundary into obese one must first be overweight. Figure 3 also seems to have a more even spread of values for the different sexes, however in Figure 4 females seem to have a higher prevalence of obesity compared to males of the same region. 
+
+```{r, echo=FALSE,warning=FALSE,message=FALSE}
+## Calculating the average prevalence of overweight and obesity
+avg_data <- prev_merge1%>% group_by(Period,ParentLocation,Sex) %>% 
+  summarise( avg_overwt_value= mean(Prev_overwt),
+             avg_obesity_value= mean(Prev_obesity))
+
+##Distribution of Overweight Among Adults by Years
+plot2_overwt <- ggplot(avg_data ,
+                       aes(x=Period,y=avg_overwt_value,color=ParentLocation)) +
+  geom_point() + 
+  facet_wrap(~Sex) + 
+  ylab("Average Overweight Prevalence") + 
+  ggtitle("Distribution of Overweight Among Adults by Years") + 
+  guides(color = guide_legend(title = "Region"))
+
+plot2_overwt
+
+```
+
+**Figure 5**
+
+```{r, echo=FALSE,warning=FALSE,message=FALSE}
+##Distribution of Obesity Among Adults by Years
+plot2_obese <- ggplot(avg_data ,
+                      aes(x=Period,y=avg_obesity_value,color=ParentLocation)) +
+  geom_point() + 
+  facet_wrap(~Sex) + 
+  ylab("Average Obesity Prevalence") + 
+  ggtitle("Distribution of Obesity Among Adults by Years") + 
+  guides(color = guide_legend(title = "Region")) +
+  scale_x_discrete(guide = guide_axis(angle = 45)) 
+
+plot2_obese
+```
+
+**Figure 6**
+
+One of our questions was the distribution of the prevalences over the years. From our exploratory analysis we can see that for both genders (male and female), the prevalence of overweight and obesity in all of the regions participating in the study showed an increase over the time period 1975 to 2016. Some regions showed a quicker increase than others. This can prompt further research into asking why these regions have such a high percent increase in obesity and overweight rates.
+
+
+
+```{r, echo=FALSE,warning=FALSE,message=FALSE}
+
+#Depression 2015 but no BS - Done
+# BP 2015 with BS - Done
+# Deaths 2019 with BS - DONE
+# Prevalance 2016 with BS - DONE
+# BMI 2015 with BS - Done
+deaths2015_bs <- deaths%>%
+  filter(Year==2015 & Gender == "Both sexes")
+
+depression2015 <- depression_tibble%>%
+  filter(Year==2015)
+
+data2015_bs <- prev_merge1 %>% filter(Period==2015 & Sex == "Both sexes")
+
+blood_pressure2015bs <- blood_pressure%>%
+  filter(Gender == "Both sexes" & Year==2015 & !is.na(FactValueNumeric))
+
+bmi2015_bs <- bmi%>%
+  filter(Year==2015 & Sex == "Both sexes")
+
+getmode <- function(v) {
+   uniqv <- unique(v)
+   uniqv[which.max(tabulate(match(v, uniqv)))]
+}
+
+getrange <- function(v) {
+a<-range(v)
+c <- paste(a[1],'-',a[2])
+return (c)
+}
+
+get_quartile <- function(v) {
+b<-as.numeric(unname(quantile(v)))
+return(b)
+}
+
+
+tab_cols <- c("Mean", "Median","Mode","Range","Var","Std Dev","25th Q", "50th Q", "75th Q", "IQR")
+stat_over<- c(round(mean(data2015_bs$Prev_overwt),2), median(data2015_bs$Prev_overwt),getmode(data2015_bs$Prev_overwt), getrange(data2015_bs$Prev_overwt), round(var(data2015_bs$Prev_overwt),2),round(sd(data2015_bs$Prev_overwt),2),get_quartile(data2015_bs$Prev_overwt)[2],get_quartile(data2015_bs$Prev_overwt)[3],get_quartile(data2015_bs$Prev_overwt)[4],IQR(data2015_bs$Prev_overwt))
+
+stat_bmi<- c(round(mean(bmi2015_bs$BMI),2), median(bmi2015_bs$BMI),getmode(bmi2015_bs$BMI), getrange(bmi2015_bs$BMI), round(var(bmi2015_bs$BMI),2), round(sd(bmi2015_bs$BMI),2),get_quartile(bmi2015_bs$BMI)[2], get_quartile(bmi2015_bs$BMI)[3], get_quartile(bmi2015_bs$BMI)[4],IQR(bmi2015_bs$BMI))
+
+stat_blood<- c(round(mean(blood_pressure2015bs$FactValueNumeric),2), median(blood_pressure2015bs$FactValueNumeric), getmode(blood_pressure2015bs$FactValueNumeric), getrange(blood_pressure2015bs$FactValueNumeric), round(var(blood_pressure2015bs$FactValueNumeric),2),round(sd(blood_pressure2015bs$FactValueNumeric),2),get_quartile(blood_pressure2015bs$FactValueNumeric)[2],get_quartile(blood_pressure2015bs$FactValueNumeric)[3],get_quartile(blood_pressure2015bs$FactValueNumeric)[4],IQR(blood_pressure2015bs$FactValueNumeric))
+
+stat_dep<- c(round(mean(depression2015$FactValueNumeric),2), median(depression2015$FactValueNumeric), getmode(depression2015$FactValueNumeric), getrange(depression2015$FactValueNumeric), round(var(depression2015$FactValueNumeric),2),round(sd(depression2015$FactValueNumeric),2),get_quartile(depression2015$FactValueNumeric)[2],get_quartile(depression2015$FactValueNumeric)[3],get_quartile(depression2015$FactValueNumeric)[4],IQR(depression2015$FactValueNumeric))
+
+stat_obese<- c(round(mean(data2015_bs$Prev_obesity),2), median(data2015_bs$Prev_obesity),getmode(data2015_bs$Prev_obesity), getrange(data2015_bs$Prev_obesity), round(var(data2015_bs$Prev_obesity),2), round(sd(data2015_bs$Prev_obesity),2),get_quartile(data2015_bs$Prev_obesity)[2],get_quartile(data2015_bs$Prev_obesity)[3],get_quartile(data2015_bs$Prev_obesity)[4],IQR(data2015_bs$Prev_obesity))
+
+stat_death<- c(round(mean(deaths2015_bs$FactValueNumeric),2),median(deaths2015_bs$FactValueNumeric),getmode(deaths2015_bs$FactValueNumeric), getrange(deaths2015_bs$FactValueNumeric),round(var(deaths2015_bs$FactValueNumeric),2),round(sd(deaths2015_bs$FactValueNumeric),2),get_quartile(deaths2015_bs$FactValueNumeric)[2],get_quartile(deaths2015_bs$FactValueNumeric)[3],get_quartile(deaths2015_bs$FactValueNumeric)[4],IQR(deaths2015_bs$FactValueNumeric))
+
+tab_df<- data.frame(tab_cols,stat_bmi,stat_over,stat_obese,stat_blood,stat_dep, stat_death)
+colnames(tab_df) <- c("Statistic", "BMI","Overweight","Obesity","Blood Pressure","Depression","Deaths")
+tab_df
+
+```
+
+
+**Figure 7:** Statistics Table for Quantitative Data
+A concise table for quantitative data’s measures of center. 
+
+
+### **Distribution Analysis**
+
+
+```{r, echo=FALSE,warning=FALSE,message=FALSE}
+bmi_2015 <- bmi %>% filter(Year == 2015, Sex == "Both sexes")
+# bmi_2015
+
+#Distribution of BMI
+ggplot(bmi_2015, aes(x=BMI)) + 
+  geom_histogram(aes(y=..density..), colour="grey", bins = 20)+
+  geom_density(kernel = "gaussian", adjust = (.3), col="blue") +
+  ggtitle("Gaussian - Distribution of BMI for Both Sexes in 2015")
+
+```
+
+**Figure 8**
+
+```{r, echo=FALSE,warning=FALSE,message=FALSE}
+
+ggplot(bmi_2015, aes(x=BMI)) + 
+  geom_histogram(aes(y=..density..), colour="grey", bins = 20)+
+  geom_density(kernel = "triangular", adjust = (.3), col="blue") +
+  ggtitle("Triangular - Distribution of BMI for Both Sexes in 2015")
+
+```
+
+**Figure 9**
+
+As we can see in figure 8 and figure 9, we used the kernel estimators. We found that the BMI for both sexes in 2015 is bimodal. In this case, we used Gaussian and Triangular kernel functions for the density plots. It peaks at approximately 26. These visualizations show that these estimators look practically the same.
+
+
+```{r, echo=FALSE,warning=FALSE,message=FALSE}
+#Boxplot of BMI
+boxplot(bmi_2015$BMI, horizontal = TRUE, axes = FALSE, staplewex = 1)
+text(x=fivenum(bmi_2015$BMI), labels =fivenum(bmi_2015$BMI), y=1.25)
+title("Boxplot of BMI for Both Sexes in 2015")
+```
+
+**Figure 10:** From the boxplot, there are a few outliers on the right. The boxplot shows that the median is 26.3. The quartile 1 is 23.9 and the quartile 3 is 27.1.
+
+```{r, echo=FALSE,warning=FALSE,message=FALSE}
+#Boxplot of BMI by Region
+bmi_region <- bmi_2015 %>% rename(Region = ParentLocation)
+ggplot(bmi_region) + 
+  geom_boxplot(mapping = aes(y=BMI, x=Region, fill=Region)) +
+  scale_x_discrete(guide = guide_axis(angle = 45)) +
+  ylab("BMI") +
+  ggtitle("Boxplot of BMI by Region in 2015")
+```
+
+**Figure 11:** The above graph shows that America and Western Pacific have the highest median of BMI by region which are followed by Europe, Eastern Mediterranean, and Africa respectively. South-East Asia has the lowest median of BMI among these region.
+
+
+```{r, echo=FALSE,warning=FALSE,message=FALSE}
+#Boxplot of BMI by Sex
+bmi_sex <- bmi %>% filter(Year == 2015)
+ggplot(bmi_sex) + 
+  geom_boxplot(mapping = aes(y=BMI, x=Sex, fill=Sex)) + 
+  ylab("BMI") +
+  ggtitle("Boxplot of BMI by Sex")
+```
+
+**Figure 12:** The boxplot shows that female has slightly higher median BMI than male. The median BMI of female, male, and both sexes are 26.1, 25.8, and 26.3 respectively.
+
+
+```{r, echo=FALSE,warning=FALSE,message=FALSE}
+# Read data
+obesity_data <- read_csv("./Data/Prevalence_Merge_Clean_2.csv", show_col_types = FALSE)
+data_2015 <- obesity_data[obesity_data$Period == 2015,]
+data_2015 <- data_2015[data_2015$SexCode == 'BTSX',]
+```
+
+```{r, eecho=FALSE,warning=FALSE,message=FALSE}
+# Histogram Overweight Both Sexes 2015
+ggplot(data = data_2015, aes(x=Prev_overwt)) + 
+  geom_histogram(aes(y=..density..), bins = 35) + 
+  geom_density(color= 'red') + xlim(0,65)  + xlab("Prevalence of Overweight")  + 
+  ggtitle("Distribution of Overweight World-Wide in 2015")
+```
+
+**Figure 13:** The prevalence of overweight consists of the percentage of individuals within the population of a certain country that have BMI greater than 25. This means that obese are individuals are counted in with the overweight population. This is something important to keep in mind as we look at distribution of the prevalence of overweight people. From figure 13 we see that the distribution is bimodal with peaks at around 30 and 60 percent, the latter of which being the largest peak. There is quite a significant dip between these two peaks suggesting that in large countries are either fairly healthy or fairly overweight and not much in between.
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+# Histogram Overweight by Sex 2015
+ggplot(data = obesity_data, aes(x=Prev_overwt)) + 
+  geom_histogram(aes(y=..density..), bins = 25) + 
+  geom_density(color= 'red') + xlim(0,60) + 
+  facet_wrap(~Sex,ncol = 1) + xlab("Prevalence of Overweight")  + 
+  ggtitle("Distribution of Overweight World-Wide by Sex in 2015")
+```
+
+**Figure 14:** The prevalence of overweight individuals by sex is largely very similar. Both sexes have bimodal distribution however there are slight differences. There are more countries wear males have lower prevalence of obesity shown by a strong peak at around 20 percent. Whereas the strongest peak for the female distribution is closer to 50 percent. This suggests that in general there is more prevalence of overweight females than males.
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+# Histogram Overweight by Region 2015
+ggplot(data = data_2015, 
+       aes(x=Prev_overwt)) + 
+  geom_histogram(aes(y=..density..), bins = 25) + 
+  geom_density(color= 'red') + 
+  xlim(0,60) + 
+  facet_wrap(~ParentLocation) + 
+  xlab("Prevalence of Overweight") + 
+  ggtitle("Distribution of Overweight by Region in 2015")
+```
+
+
+**Figure 15:** Prevalence of overweight individuals varies significantly by region. The Americas and Europe have the highest rates of overweight amongst the six regions. In the Eastern Mediterranean and Western pacific regions we see a more uniform distribution of overweight countries. Countries in Africa and South-East Asia have the smallest prevalences of overweight people with values ranging from 20-40 percent.
+
+```{r boxplot_prevalence,echo=FALSE, warning=FALSE, message=FALSE}
+#Import the clean Prevalence Data set
+data <-  read_csv("./Data/Prevalence_Merge_Clean_2.csv", show_col_types = FALSE)
+tibbled_data <- as_tibble(data)
+ggplot(data = tibbled_data) + 
+  geom_boxplot(mapping = aes(x = Prev_obesity, y = ParentLocation, color = Sex)) + 
+  labs(x = "Prevalence of Obesity Among Adults") + 
+  ggtitle("Prevalence of Obesity for each region by sex")
+```
+
+**Figure 16:** In figure 16 we can see the shapes of our distributions by both region and sex. This multi faceted box-plot shows the variation in the prevalence of obesity based on these two factors. In the following plots we will analyze each one of these characteristics individually to uncover the relationships between sex, region and obesity.
+
+
+```{r, echo=FALSE,warning=FALSE,message=FALSE}
+# Histogram Obesity Both Sexes 2015
+ggplot(data = data_2015, aes(x=Prev_obesity)) + 
+  geom_histogram(aes(y=..density..), bins = 35) + 
+  geom_density(color= 'red') + xlim(0,65)  + xlab("Prevalence of Obesity")  + 
+  ggtitle("Distribution of Obesity World-Wide in 2015")
+
+```
+
+**Figure 17:** In the figure above we can see the distribution of the prevalence of obesity in countries around the world in the year 2015. This plot accounts for both males and females. The density estimate line shows us that the distribution is bimodal with peaks at 7 and 20 percent obesity rate. In addition to this we see a heavy positive skew that shows that there are countries that have rates of obesity that exceed 50 percent of the population.  
+
+```{r,echo=FALSE,warning=FALSE,message=FALSE}
+# Histogram Obesity by Region 2015
+ggplot(data = data_2015, 
+       aes(x=Prev_obesity)) + 
+  geom_histogram(aes(y=..density..), bins = 25) + 
+  geom_density(color= 'red') + 
+  xlim(0,60) + 
+  facet_wrap(~ParentLocation) + 
+  xlab("Prevalence of Obesity") + 
+  ggtitle("Distribution of Obesity by Region in 2015")
+```
+
+**Figure 18:** In figure 18 we have the distribution of obesity by region in the world accounting for both males and females. This chart shows that there are distinct differences in the prevalence of obesity between regions. Africa and South-East Asia have many more countries with lower rates of obesity having peaks in their distributions at 10 and 5 percent respectively. In contrast to this the Americas, Eastern Mediterranean, European, and Western Pacific regions have distributions that are centered much further to the right showing that the countries in these regions tend to have much higher rates of obesity.
+
+
+```{r,echo=FALSE,warning=FALSE,message=FALSE}
+
+# Histogram Obesity by Sex 2015
+ggplot(data = obesity_data, aes(x=Prev_obesity)) + 
+  geom_histogram(aes(y=..density..), bins = 25) + 
+  geom_density(color= 'red') + xlim(0,60) + 
+  facet_wrap(~Sex,ncol = 1) + xlab("Prevalence of Obesity")  + 
+  ggtitle("Distribution of Obesity World-Wide by Sex in 2015")
+
+```
+
+
+**Figure 19** In figure 19 we see another breakdown of the distribution of obesity but this time by sex. Both males and females have a bimodal distribution of obesity. However, the female data is slightly more spread out showing that there are more countries that have a male prevalence of obesity over 20 percent. The male distribution has a fairly heavy peak between 5-10 percent obesity. This shows us that males have slightly lower rates of obesity than females.
+
+Overall, we have observed patterns in the distributions of the prevalence of obesity that suggest that there are many factors that play a role in obesity rates around the world. Both sex and region seem to be key in analyzing how obesity affects countries world-wide.
+
+```{r,echo=FALSE,warning=FALSE,message=FALSE}
+# Histogram Deaths by Region 2015
+ggplot(data = deaths2015_bs, 
+       aes(x=FactValueNumeric)) + 
+  geom_histogram(aes(y=..density..), bins = 25) + 
+  geom_density(color= 'red') + 
+  xlim(0,60) + 
+  facet_wrap(~ParentLocation) + 
+  xlab("Deaths caused by obesity related diseases") + 
+  ggtitle("Distribution of Deaths by Region in 2015")
+```
+
+**Figure 20** In figure 20, we can see that in Africa, Americas, Eastern Mediterranean, and South-East Asia the distribution of deaths follows a uni-modal distribution. Also Europe and Western Pacific have a bimodal distribution for their region's probability of deaths. Later we wish to analyze if the means of the different regions differ significantly or not through a hypothesis test. 
+
+# **Results**
+
+### **Variable Case Study**
+
+```{r, echo=FALSE,warning=FALSE,message=FALSE,out.width="75%" }
+#Box Plots
+
+bmi_2015 <- bmi %>%
+  filter(Year == "2015",
+         Sex == "Both sexes")
+
+bmi_2010 <- bmi %>%
+  filter(Year == "2010",
+         Sex == "Both sexes")
+
+bmi_2000 <- bmi %>%
+  filter(Year == "2000",
+         Sex == "Both sexes")
+
+boxplot(bmi_2015$BMI, horizontal = TRUE, axes = FALSE, staplewex = 1)
+text(x=fivenum(bmi_2015$BMI), labels =fivenum(bmi_2015$BMI), y=1.25)
+title("Boxplot of BMI 2015")
+
+
+boxplot(bmi_2010$BMI, horizontal = TRUE, axes = FALSE, staplewex = 1)
+text(x=fivenum(bmi_2010$BMI), labels =fivenum(bmi_2010$BMI), y=1.25)
+title("Boxplot of BMI 2010")
+
+boxplot(bmi_2000$BMI, horizontal = TRUE, axes = FALSE, staplewex = 1)
+text(x=fivenum(bmi_2000$BMI), labels =fivenum(bmi_2000$BMI), y=1.25)
+title("Boxplot of BMI 2000")
+
+```
+
+Throughout this paper we discussed the population distribution for prevalence of specific BMI’s. For the “variable case study” we wish to analyze the BMI value across the different countries. 
+
+BMI is a continuous value from 0 to infinity. However infinity isn’t reasonable in real applications as there are no individuals with infinite weight or height. 0 is also an “unreasonable” metric because this would require the individual to have 0 mass (i.e. they don’t exist). Since we are not dealing with a population that has ghosts and giants to sample from these are unreasonable numbers. Though based on the equation to find BMI, they’re not mathematically impossible. 
+
+Earlier in our distribution analysis, we first talked about the BMI distribution for all the countries in the study in 2015. We would say we sampled the entire population, however, this is untrue because not all countries in the world participated in the World Health Organization’s study. 
+
+The box plots for the countries average BMI for years 2015, 2010, and 2000 show that over the years the average BMI of all the countries in the study were increasing.
+
+
+```{r, echo=FALSE,warning=FALSE,message=FALSE}
+#Histograms
+
+
+bmi_2015 <- bmi %>%
+  filter(Year == "2015",
+         Sex == "Both sexes")
+
+bmi_2010 <- bmi %>%
+  filter(Year == "2010",
+         Sex == "Both sexes")
+
+bmi_2000 <- bmi %>%
+  filter(Year == "2000",
+         Sex == "Both sexes")
+
+ggplot(bmi_2015, aes(x = BMI)) +
+  geom_histogram(aes(y=..density..), 
+                 col="grey", bins = 20) +
+  geom_density(kernel = "gaussian", adjust = (.3), col = "blue") +
+  ggtitle("Distribution of BMI with Gaussian Kernel\n2015")
+
+ggplot(bmi_2010, aes(x = BMI)) +
+  geom_histogram(aes(y=..density..), col="grey", bins = 20) +
+  geom_density(kernel = "gaussian", adjust = (.3), col = "blue") +
+  ggtitle("Distribution of BMI with Gaussian Kernel\n2010")
+
+ggplot(bmi_2000, aes(x = BMI)) +
+  geom_histogram(aes(y=..density..), col="grey", bins = 20) +
+  geom_density(kernel = "gaussian", adjust = (.3), col = "blue") +
+  ggtitle("Distribution of BMI with Gaussian Kernel\n2000")
+
+```
+
+We can also see from the histograms to the above and to the left that the distribution of the mean BMI’s stayed relatively similar between the years 2015, 2010, and 2000. This distribution isn’t following any of the standard distributions that are commonly known. That is because the distribution is bimodal with two consistent peaks. One major peak around the mean and median and then a smaller peak on the lower side of the distribution. 
+
+Also seen from the box plots in the histograms we can see that there are outliers in the upper ranges of the distribution, however, this is not as much the case in the lower. As we can see from the Statistical Table in Figure 7, the mean is pulled higher than the median.
+
+```{r, echo=FALSE,warning=FALSE,message=FALSE}
+#QQ-Plot
+
+#QQPlot of BMI
+qqdat <- bmi_2015$BMI
+qqnorm(qqdat, main = "Normal Q-Q BMI for Both Sexes in 2015")
+qqline(qqdat, col = "steelblue", lwd = 2)
+```
+
+The Normal QQ-Plot to the left shows that the distribution of BMI averages for the countries does not follow a normal distribution. However, a normal distribution could be used as a rough estimate of the distribution, if needed. As the values go past 2 standard deviations away from the mean the estimation would be less accurate. 
+
+
+# Hypothesis Testing
+
+## Two Sample One Sided T test
+
+Ho: Mean of Prevalence of Obesity in 2015 = Mean of Prevalence of Obesity in 2014/2013/2012/2011/2010
+
+Ha: Mean of Prevalence of Obesity in 2015 > Mean of Prevalence of Obesity in 2014/2013/2012/2011/2010
+
+```{r, include = FALSE}
+library(tidyverse)
+library(knitr)
+```
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE }
+
+#Loading the datasets
+
+deaths <- read_csv("./Data/deaths_data_clean.csv")
+prev_merge1 <- read_csv("./Data/Prevalence_Merge_Clean_2.csv")
+
+# T- test for Prevelance of Obesity
+
+data2015 <- prev_merge1 %>% filter(Period==2015)
+
+f <- function(year) {
+data <- prev_merge1 %>% filter(Period==year)
+t.test(data2015$Prev_obesity,data$Prev_obesity,alternative = "greater",var.equal=FALSE)$p.value
+}
+
+# Running T tests for various yeras
+val_14<-f(2014)
+val_13<-f(2013)
+val_12<- f(2012)
+val_11<- f(2011)
+val_10 <- f(2010)
+tab_df<- data.frame("p-value",val_14,val_13,val_12,val_11,val_10)
+colnames(tab_df) <- c("Years", "2015 vs 2014","2015 vs 2013","2015 vs 2012","2015 vs 2011","2015 vs 2010")
+
+kable(tab_df, caption = "Results from T test" )
+
+
+data2012 <- prev_merge1 %>% filter(Period==2012)
+t.test(data2015$Prev_overwt,data2012$Prev_overwt,alternative = "greater",var.equal=FALSE)
+```
+
+In order to determine whether or not obesity is becoming more prevalent over time we conducted multiple two sample one-sided t tests comparing 2015 to the 5 previous years. We are testing the null hypothesis that the mean prevalence of obesity in 2015 is equal to the mean prevalence of obesity in the years 2010-2014. The alternative hypothesis is that the mean prevalence of obesity in 2015 is greater than the mean in the years 2010-2014. In the table above we see the results from our 5 tests. As shown in table above, when comparing the years 2015 and 2012 we see our first statistically significant result using alpha=0.05. With a p-value of 0.029 we reject the null hypothesis and conclude that the prevalence of obesity in 2015 is greater than the prevalence of obesity in 2012. This reaffirms our exploratory analysis and shows that obesity is increasing worldwide as time moves on.
+
+## ANOVA test
+
+Ho: Mean of Deaths in America= Mean of Deaths in Africa = Mean of Deaths in Southeast Asia = Mean of Deaths in Europe = Mean of Deaths in Western Pacific = Mean of Deaths in Eastern Mediterranean
+
+Ha: Not all are equal
+
+```{r , echo=FALSE, warning=FALSE, message=FALSE }
+# ANOVA for Deaths dataset wrt Region
+
+deaths2015_bs <- deaths%>%
+  filter(Year==2015 & Gender == "Both sexes")
+
+a<-aov(FactValueNumeric~ParentLocation,data=deaths2015_bs)
+summary(a)
+```
+
+Moving forward with our analysis, we conducted an anova test with the goal of determining whether or not the probability that an individual will die between age 30 and 70 from any cardiovascular disease, cancer, diabetes or chronic respiratory disease differs by region of the world. With a p-value 6.56e-7 and alpha=0.05 we reject the null hypothesis and conclude that at least one region differs from the others. This means that region has a significant impact on the likelihood of death due to obesity related diseases.
+
+
+# **Conclusion**
+
+![](./Screenshots/Conclusion.png)
+In the end, we can conclude that there is a steady increase in obesity and overweight across the globe. This can be seen through our hypothesis testing, which showed a significant difference in the average prevalence of obesity between the years 2015 and 2012, and then again between 2012 and previous years. The prevalence of obesity/overweight is not normally distributed, however, all regions exhibit a steady increase with years. Moreover, it is observed that women seem to have a higher prevalence of obesity in all regions across the globe, but not necessarily in overweight prevalence. Females have a higher mean BMI than males. The mean BMI of females is about 25, but the mean BMI of male is about 24. 
+
+In Africa there has been a noticeable steeper increase of overweight and obesity prevalence in females compared to that of males. In Europe it appears that the prevalence of overweight in males has increased more quickly than that of females. However, besides these two mentioned the other regions show similar rise of overweight prevalence over the time period for both sexes. Also, Eastern Mediterranean, and Europe have the highest mean BMI which are approximately 25. However, South-East Asia has the lowest mean BMI which is approximately 21. From our hypothesis testing it has been concluded that there is at least one region that has a statistically significant difference in the likelihood of death due to obesity related disease between the ages of 30 and 70. This shows that regions have a significant impact of obesity related deaths for individuals within this age group. 
+
+It is also important to understand that the obesity distribution peaks at a much lower prevalence than the overweight distribution. This is because all obese people are considered overweight but not all overweight people are considered obese. So naturally the prevalence of overweight in our regions is going to be higher than prevalence of obesity because overweight is a larger “bucket” so to speak.
+
+The next important conclusion is that European countries are more aware of their population's habits and BMI health, while African countries are not as aware. This is supported by the fact that Africa had a noticeably large portion of countries that said they did not have surveys. However, European countries had a noticeably larger portion of the countries saying they did have surveys for all three categories in 2021. The exploratory analysis also helps in building a relation between  surveying the obesity and overweight trends with factors that can cause obesity. A large number of countries that did have a survey on overweight/obesity in 2021, also had a survey on unhealthy diets and physical inactivity. This could suggest that countries that are surveying are trying to get a holistic perspective of their populations.
